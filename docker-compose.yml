@@ -1,0 +1,50 @@
+services:
+    # image project
+    app:
+      build:
+        context: .
+        dockerfile: Dockerfile
+      restart: unless-stopped
+      working_dir: /var/www/
+      volumes:
+        - ./:/var/www
+      depends_on:
+        - redis
+      networks:
+        - multi_currency_network
+
+    # nginx
+    nginx:
+      image: nginx:alpine
+      restart: unless-stopped
+      ports:
+        - "8585:80"
+      volumes:
+        - ./:/var/www
+        - ./docker/nginx/:/etc/nginx/conf.d/
+      networks:
+        - multi_currency_network
+
+    # db mysql
+    db:
+      image: mysql:8.0
+      restart: unless-stopped
+      environment:
+        MYSQL_DATABASE: ${DB_DATABASE:-laravel}
+        MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      volumes:
+        - ./.docker/mysql/dbdata:/var/lib/mysql
+      ports:
+        - "3305:3306"
+      networks:
+        - multi_currency_network
+
+    # redis
+    redis:
+      image: redis:latest
+      networks:
+        - multi_currency_network
+
+networks:
+  multi_currency_network:
+    driver: bridge
