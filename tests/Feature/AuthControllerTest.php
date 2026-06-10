@@ -23,10 +23,12 @@ class AuthControllerTest extends TestCase
     public function test_a_user_can_register_successfully()
     {
         $payload = [
-            'name'                  => 'John Doe',
-            'email'                 => 'john@example.com',
-            'password'              => 'Password123',
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'password' => 'Password123',
             'password_confirmation' => 'Password123',
+            'country' => 'Brazil',
+            'local_currency' => 'BRL'
         ];
 
         $response = $this->postJson('/api/auth/register', $payload);
