@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\ValueObjects\Money;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,9 +19,9 @@ class PaymentRequestResource extends JsonResource
             'id' => $this->id,
             'user_id' => $this->user_id,
             'local_currency' => $this->local_currency,
-            'local_amount' => $this->local_amount,
+            'local_amount' => $this->local_amount instanceof Money ? $this->local_amount->getAmount() : $this->local_amount,
             'target_currency' => $this->target_currency,
-            'converted_amount' => $this->converted_amount,
+            'converted_amount' => $this->converted_amount instanceof Money ? $this->converted_amount->getAmount() : $this->converted_amount,
             'exchange_rate' => $this->exchange_rate,
             'exchange_rate_source' => $this->exchange_rate_source,
             'exchange_rate_fetched_at' => $this->exchange_rate_fetched_at,

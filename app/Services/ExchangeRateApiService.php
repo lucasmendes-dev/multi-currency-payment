@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Interfaces\ExchangerateInterface;
+use App\ValueObjects\Money;
 use Exception;
 use Illuminate\Support\Facades\Http;
 
@@ -73,9 +74,9 @@ class ExchangeRateApiService implements ExchangerateInterface
         return $rates[$to] / $rates[$from];
     }
 
-    public function convert(float $amount, string $from): float
+    public function convert(Money $money): Money
     {
-        $rate = $this->getExchangeRate($from);
-        return round($amount * $rate, 2);
+        $rate = $this->getExchangeRate($money->getCurrency());
+        return new Money($money->getAmount() * $rate, $this->defaultSystemCurrency);
     }
 }

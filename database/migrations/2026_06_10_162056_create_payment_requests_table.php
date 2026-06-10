@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('target_currency');
             $table->decimal('converted_amount', 10, 2);
 
-            $table->decimal('exchange_rate', 10, 2);
+            $table->decimal('exchange_rate', 18, 8);
             $table->string('exchange_rate_source');
             $table->timestamp('exchange_rate_fetched_at');
 

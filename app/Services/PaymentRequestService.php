@@ -7,6 +7,7 @@ use App\Http\Requests\StorePaymentRequest;
 use App\Http\Resources\PaymentRequestResource;
 use App\Interfaces\ExchangerateInterface;
 use App\Models\PaymentRequest;
+use App\ValueObjects\Money;
 
 class PaymentRequestService
 {
@@ -23,7 +24,12 @@ class PaymentRequestService
         $data['exchange_rate_source'] = config('app.exchange_rate_source');
         $data['exchange_rate_fetched_at'] = now();
 
-        $data['converted_amount'] = $this->exchangeRateService->convert($data['local_amount'], $data['local_currency']);
+        $localMoney = new Money((float)$data['local_amount'], $data['local_currency']);
+        $convertedMoney = $this->exchangeRateService->convert($localMoney);
+
+        $data['local_amount'] = $localMoney;
+        $data['converted_amount'] = $convertedMoney;
+
         $data['status'] = PaymentStatusEnum::PENDING->value;
         $data['expires_at'] = now()->addHours(48);
 

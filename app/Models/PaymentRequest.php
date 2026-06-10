@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\MoneyCast;
 use App\Enums\PaymentStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -35,6 +36,8 @@ class PaymentRequest extends Model
     {
         return [
             'status' => PaymentStatusEnum::class,
+            'local_amount' => MoneyCast::class,
+            'converted_amount' => MoneyCast::class,
         ];
     }
 
