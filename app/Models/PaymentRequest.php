@@ -1,0 +1,54 @@
+<?php
+
+namespace App\Models;
+
+use App\Enums\PaymentStatusEnum;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class PaymentRequest extends Model
+{
+    /** @use HasFactory<\Database\Factories\PaymentRequestFactory> */
+    use HasFactory;
+
+    protected $fillable = [
+        'user_id',
+        'local_amount',
+        'local_currency',
+        'exchange_rate',
+        'exchange_rate_source',
+        'exchange_rate_fetched_at',
+        'eur_amount',
+        'description',
+        'status',
+        'approved_by',
+        'approved_at',
+        'rejected_by',
+        'rejected_at',
+        'rejection_reason',
+        'expires_at',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'status' => PaymentStatusEnum::class,
+        ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+
+    public function rejector(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'rejected_by');
+    }
+}
