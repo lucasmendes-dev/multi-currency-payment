@@ -26,6 +26,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'country',
+        'local_currency',
     ];
 
     /**
@@ -55,5 +57,10 @@ class User extends Authenticatable
     public function paymentRequests(): HasMany
     {
         return $this->hasMany(PaymentRequest::class);
+    }
+
+    public function isFinance(): bool
+    {
+        return $this->role === 'finance';
     }
 }

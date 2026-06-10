@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
@@ -26,9 +26,11 @@ class AuthController extends Controller
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
+            'name' => $request->name,
+            'email' => $request->email,
             'password' => Hash::make($request->password),
+            'country' => $request->country,
+            'local_currency' => $request->local_currency,
         ]);
 
         $token = $user->createToken(
@@ -39,9 +41,9 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'User registered successfully.',
-            'user'    => new UserResource($user),
-            'token'   => $token,
-            'type'    => 'Bearer',
+            'user' => new UserResource($user),
+            'token' => $token,
+            'type' => 'Bearer',
             'expires_in_minutes' => $this->sanctumTokenExpiration,
         ], 201);
     }
@@ -71,9 +73,9 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Logged in successfully.',
-            'user'    => new UserResource($user),
-            'token'   => $token,
-            'type'    => 'Bearer',
+            'user' => new UserResource($user),
+            'token' => $token,
+            'type' => 'Bearer',
             'expires_in_minutes' => $this->sanctumTokenExpiration,
         ]);
     }
@@ -126,8 +128,8 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Token refreshed successfully.',
-            'token'   => $token,
-            'type'    => 'Bearer',
+            'token' => $token,
+            'type' => 'Bearer',
             'expires_in_minutes' => $this->sanctumTokenExpiration,
         ]);
     }

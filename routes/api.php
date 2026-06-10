@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\PaymentRequestController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,15 +15,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// ── Public ────────────────────────────────────────────────────────────────
+// ── Auth ────────────────────────────────────────────────────────────────
 Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login',    [AuthController::class, 'login']);
 });
 
-// ── Protected ─────────────────────────────────────────────────────────────
 Route::prefix('auth')->middleware('auth:sanctum')->group(function () {
     Route::get('/me',       [AuthController::class, 'me']);
     Route::post('/logout',  [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);
+});
+
+// ── Payments ─────────────────────────────────────────────────────────────
+Route::prefix('payments')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [PaymentRequestController::class, 'index']);
+    Route::post('/', [PaymentRequestController::class, 'store']);
 });
