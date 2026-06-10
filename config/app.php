@@ -123,4 +123,7 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'exchange_rate_api_token' => env('EXCHANGE_RATE_API_TOKEN'),
+    'default_convertion_currency' => env('DEFAULT_CONVERTION_CURRENCY', 'EUR'),
+    'exchange_rate_source' => env('EXCHANGE_RATE_SOURCE'),
 ];

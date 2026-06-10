@@ -14,12 +14,13 @@ class PaymentRequest extends Model
 
     protected $fillable = [
         'user_id',
-        'local_amount',
         'local_currency',
+        'local_amount',
+        'target_currency',
+        'converted_amount',
         'exchange_rate',
         'exchange_rate_source',
         'exchange_rate_fetched_at',
-        'eur_amount',
         'description',
         'status',
         'approved_by',

@@ -15,14 +15,14 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
 
-            $table->decimal('local_amount', 10, 2);
             $table->string('local_currency');
+            $table->decimal('local_amount', 10, 2);
+            $table->string('target_currency');
+            $table->decimal('converted_amount', 10, 2);
 
             $table->decimal('exchange_rate', 10, 2);
             $table->string('exchange_rate_source');
             $table->timestamp('exchange_rate_fetched_at');
-
-            $table->decimal('eur_amount', 10, 2);
 
             $table->string('description');
 
