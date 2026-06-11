@@ -31,4 +31,8 @@ Route::prefix('auth')->middleware('auth:sanctum')->group(function () {
 Route::prefix('payments')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [PaymentRequestController::class, 'index']);
     Route::post('/', [PaymentRequestController::class, 'store']);
+    Route::get('/{paymentId}', [PaymentRequestController::class, 'show']);
+
+    Route::patch('/{paymentId}/approve', [PaymentRequestController::class, 'approve'])->middleware('finance');
+    Route::patch('/{paymentId}/reject', [PaymentRequestController::class, 'reject'])->middleware('finance');
 });

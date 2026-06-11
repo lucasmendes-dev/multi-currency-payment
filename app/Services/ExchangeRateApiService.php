@@ -30,7 +30,7 @@ class ExchangeRateApiService implements ExchangerateInterface
         $response = Http::timeout(10)->get($this->apiUrl);
 
         if (!$response->successful()) {
-            throw new Exception('Failed to retrieve exchange rates.');
+            throw new Exception('Failed to retrieve exchange rates. Check the API call details.');
         }
 
         return $response->json();

@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\ValueObjects\Money;
+use BackedEnum;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -31,9 +32,15 @@ class PaymentRequestResource extends JsonResource
             'approved_at' => $this->approved_at,
             'rejected_by' => $this->rejected_by,
             'rejected_at' => $this->rejected_at,
+            'rejection_reason' => $this->rejection_reason,
             'expires_at' => $this->expires_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'user' => $this->whenLoaded('user', fn () => [
+                'name' => $this->user->name,
+                'email' => $this->user->email,
+                'country' => $this->user->country,
+            ]),
         ];
     }
 }

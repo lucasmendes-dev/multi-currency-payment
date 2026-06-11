@@ -61,6 +61,6 @@ class User extends Authenticatable
 
     public function isFinance(): bool
     {
-        return $this->role === 'finance';
+        return $this->role->value === 'finance';
     }
 }

@@ -15,7 +15,7 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && auth()->user()->isFinance()) {
+        if (auth()->check() && $request->user()->isFinance()) {
             return $next($request);
         }
 
