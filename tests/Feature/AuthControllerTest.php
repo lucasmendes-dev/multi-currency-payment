@@ -179,4 +179,140 @@ class AuthControllerTest extends TestCase
         $this->postJson('/api/auth/logout')->assertStatus(401);
         $this->postJson('/api/auth/refresh')->assertStatus(401);
     }
+
+    // ── Registration Validation Tests ────────────────────────────────────────
+
+    public function test_registration_requires_mandatory_fields()
+    {
+        $response = $this->postJson('/api/auth/register', []);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'name',
+                'email',
+                'password',
+                'country',
+                'local_currency',
+            ]);
+    }
+
+    public function test_registration_validates_email_format()
+    {
+        $response = $this->postJson('/api/auth/register', [
+            'name' => 'John Doe',
+            'email' => 'not-an-email',
+            'password' => 'Password123',
+            'password_confirmation' => 'Password123',
+            'country' => 'Brazil',
+            'local_currency' => 'BRL'
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+    }
+
+    public function test_registration_validates_email_uniqueness()
+    {
+        User::factory()->create(['email' => 'duplicate@example.com']);
+
+        $response = $this->postJson('/api/auth/register', [
+            'name' => 'John Doe',
+            'email' => 'duplicate@example.com',
+            'password' => 'Password123',
+            'password_confirmation' => 'Password123',
+            'country' => 'Brazil',
+            'local_currency' => 'BRL'
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+    }
+
+    public function test_registration_validates_password_confirmation()
+    {
+        $response = $this->postJson('/api/auth/register', [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'password' => 'Password123',
+            'password_confirmation' => 'Mismatched123',
+            'country' => 'Brazil',
+            'local_currency' => 'BRL'
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['password']);
+    }
+
+    public function test_registration_validates_password_strength_requirements()
+    {
+        // Too short (less than 8)
+        $responseShort = $this->postJson('/api/auth/register', [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'password' => 'Pas1',
+            'password_confirmation' => 'Pas1',
+            'country' => 'Brazil',
+            'local_currency' => 'BRL'
+        ]);
+        $responseShort->assertStatus(422)->assertJsonValidationErrors(['password']);
+
+        // Missing numbers
+        $responseNoNumbers = $this->postJson('/api/auth/register', [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'password' => 'PasswordNoNum',
+            'password_confirmation' => 'PasswordNoNum',
+            'country' => 'Brazil',
+            'local_currency' => 'BRL'
+        ]);
+        $responseNoNumbers->assertStatus(422)->assertJsonValidationErrors(['password']);
+
+        // Missing uppercase/lowercase mixed case
+        $responseNoMixed = $this->postJson('/api/auth/register', [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+            'country' => 'Brazil',
+            'local_currency' => 'BRL'
+        ]);
+        $responseNoMixed->assertStatus(422)->assertJsonValidationErrors(['password']);
+    }
+
+    public function test_registration_validates_currency_max_length()
+    {
+        $response = $this->postJson('/api/auth/register', [
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'password' => 'Password123',
+            'password_confirmation' => 'Password123',
+            'country' => 'Brazil',
+            'local_currency' => 'BRLXX' // too long
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['local_currency']);
+    }
+
+    // ── Login Validation Tests ───────────────────────────────────────────────
+
+    public function test_login_requires_email_and_password()
+    {
+        $response = $this->postJson('/api/auth/login', []);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email', 'password']);
+    }
+
+    public function test_login_validates_email_format()
+    {
+        $response = $this->postJson('/api/auth/login', [
+            'email' => 'not-an-email',
+            'password' => 'password'
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+    }
 }
+

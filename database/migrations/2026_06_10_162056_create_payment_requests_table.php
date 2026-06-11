@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('exchange_rate_source');
             $table->timestamp('exchange_rate_fetched_at');
 
-            $table->string('description');
+            $table->string('description')->nullable();
 
             $table->enum('status', ['pending', 'approved', 'rejected', 'expired']);
 
