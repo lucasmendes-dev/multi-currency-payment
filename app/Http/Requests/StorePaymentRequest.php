@@ -24,7 +24,7 @@ class StorePaymentRequest extends FormRequest
     {
         return [
             'local_amount' => 'required|numeric|min:1',
-            'local_currency' => 'required|string',
+            'local_currency' => 'required|string|max:3|min:3',
             'description' => 'nullable|string|max:255',
         ];
     }

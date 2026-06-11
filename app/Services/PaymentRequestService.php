@@ -4,10 +4,10 @@ namespace App\Services;
 
 use App\Enums\PaymentStatusEnum;
 use App\Http\Requests\StorePaymentRequest;
-use App\Http\Resources\PaymentRequestResource;
 use App\Interfaces\ExchangerateInterface;
 use App\Models\PaymentRequest;
 use App\ValueObjects\Money;
+use Illuminate\Http\Request;
 
 class PaymentRequestService
 {
@@ -15,7 +15,7 @@ class PaymentRequestService
         private ExchangerateInterface $exchangeRateService
     ) {}
 
-    public function createPaymentRequest(array $data, StorePaymentRequest $request): PaymentRequestResource
+    public function createPaymentRequest(array $data, StorePaymentRequest $request): PaymentRequest
     {
         $data['user_id'] = $request->user()->id;
         $data['target_currency'] = config('app.default_convertion_currency');
@@ -33,7 +33,42 @@ class PaymentRequestService
         $data['status'] = PaymentStatusEnum::PENDING->value;
         $data['expires_at'] = now()->addHours(48);
 
-        $paymentRequest = PaymentRequest::create($data);
-        return new PaymentRequestResource($paymentRequest);
+        return PaymentRequest::create($data);
+    }
+
+    public function approvePaymentRequest(int $paymentId): PaymentRequest
+    {
+        $paymentRequest = PaymentRequest::findOrFail($paymentId);
+
+        if ($paymentRequest->status->value !== PaymentStatusEnum::PENDING->value) {
+            throw new \Exception("Payment request should be in 'pending' state to be approved. Current state is: '{$paymentRequest->status->value}'");
+        }
+
+        $paymentRequest->status = PaymentStatusEnum::APPROVED->value;
+
+        $paymentRequest->approved_at = now();
+        $paymentRequest->approved_by = auth()->user()->id;
+
+        $paymentRequest->save();
+
+        return $paymentRequest;
+    }
+
+    public function rejectPaymentRequest(int $paymentId, string $rejectionReason): PaymentRequest
+    {
+        $paymentRequest = PaymentRequest::findOrFail($paymentId);
+
+        if ($paymentRequest->status->value !== PaymentStatusEnum::PENDING->value) {
+            throw new \Exception("Payment request should be in 'pending' state to be rejected. Current state is: '{$paymentRequest->status->value}'");
+        }
+
+        $paymentRequest->status = PaymentStatusEnum::REJECTED->value;
+
+        $paymentRequest->rejected_at = now();
+        $paymentRequest->rejected_by = auth()->user()->id;
+        $paymentRequest->rejection_reason = $rejectionReason;
+        $paymentRequest->save();
+
+        return $paymentRequest;
     }
 }
