@@ -24,8 +24,8 @@ class PaymentRequestController extends Controller
         $this->authorize('viewAny', PaymentRequest::class);
 
         $query = $request->user()->isFinance()
-            ? PaymentRequest::query()
-            : PaymentRequest::where('user_id', $request->user()->id);
+            ? PaymentRequest::with('user')
+            : PaymentRequest::with('user')->where('user_id', $request->user()->id);
 
         $paymentRequests = $filter->apply($query)->paginate(10);
 
@@ -55,7 +55,7 @@ class PaymentRequestController extends Controller
 
     public function show(int $paymentId): JsonResponse
     {
-        $paymentRequest = PaymentRequest::findOrFail($paymentId);
+        $paymentRequest = PaymentRequest::with('user')->findOrFail($paymentId);
 
         $this->authorize('view', $paymentRequest);
 
@@ -68,7 +68,7 @@ class PaymentRequestController extends Controller
     {
         $this->authorize('approve', PaymentRequest::class);
 
-        $paymentRequest = $this->paymentRequestService->approvePaymentRequest($paymentId);
+        $paymentRequest = $this->paymentRequestService->approvePaymentRequest($paymentId)->load('user');
 
         return response()->json([
             'message' => 'Payment request approved successfully.',
@@ -81,7 +81,7 @@ class PaymentRequestController extends Controller
         $this->authorize('reject', PaymentRequest::class);
 
         $rejectionReason = $request->input('rejection_reason') ?? '';
-        $paymentRequest = $this->paymentRequestService->rejectPaymentRequest($paymentId, $rejectionReason);
+        $paymentRequest = $this->paymentRequestService->rejectPaymentRequest($paymentId, $rejectionReason)->load('user');
 
         return response()->json([
             'message' => 'Payment request rejected successfully.',
