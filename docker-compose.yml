@@ -45,6 +45,19 @@ services:
       networks:
         - multi_currency_network
 
+    # worker to run the schedule 
+    worker:
+      build: .
+      command: php artisan schedule:work
+      volumes:
+        - ./:/var/www
+      depends_on:
+        - redis
+        - db
+      restart: always
+      networks:
+        - multi_currency_network
+
 networks:
   multi_currency_network:
     driver: bridge
