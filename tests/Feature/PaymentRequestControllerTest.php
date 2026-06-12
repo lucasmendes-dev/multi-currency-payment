@@ -402,7 +402,7 @@ class PaymentRequestControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('message', 'Payment request approved successfully.')
             ->assertJsonPath('data.status', 'approved')
-            ->assertJsonPath('data.approved_by', $financeUser->id);
+            ->assertJsonPath('data.approved_by', $financeUser->name);
 
         $this->assertDatabaseHas('payment_requests', [
             'id' => $payment->id,
@@ -490,7 +490,7 @@ class PaymentRequestControllerTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonPath('message', 'Payment request rejected successfully.')
             ->assertJsonPath('data.status', 'rejected')
-            ->assertJsonPath('data.rejected_by', $financeUser->id)
+            ->assertJsonPath('data.rejected_by', $financeUser->name)
             ->assertJsonPath('data.rejection_reason', 'Budget exceeded');
 
         $this->assertDatabaseHas('payment_requests', [
