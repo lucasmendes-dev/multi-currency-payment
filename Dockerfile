@@ -27,6 +27,10 @@ RUN useradd -G www-data,root -u $uid -d /home/$user $user
 RUN mkdir -p /home/$user/.composer && \
     chown -R $user:$user /home/$user
 
+# Install Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs
+
 # Install redis
 RUN pecl install -o -f redis \
     &&  rm -rf /tmp/pear \

@@ -26,7 +26,5 @@ class DatabaseSeeder extends Seeder
         ]);
 
         User::factory(5)->create();
-
-        PaymentRequest::factory(10)->create();
     }
 }
