@@ -134,11 +134,11 @@ export default function FinanceRequestDetail() {
                 <DialogContent>
                     <form onSubmit={reject}>
                         <DialogHeader>
-                            <DialogTitle>Reject request</DialogTitle>
+                            <DialogTitle>Reject Request</DialogTitle>
                             <DialogDescription>Add an optional reason for the employee.</DialogDescription>
                         </DialogHeader>
                         <div className="mt-4 space-y-2">
-                            <Label htmlFor="rejection_reason">Reason</Label>
+                            <Label htmlFor="rejection_reason">Reason (Optional)</Label>
                             <Textarea id="rejection_reason" value={rejectionReason} onChange={(event) => setRejectionReason(event.target.value)} />
                         </div>
                         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}

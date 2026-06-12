@@ -34,8 +34,8 @@ class PaymentRequestResource extends JsonResource
             'rejected_at' => $this->rejected_at,
             'rejection_reason' => $this->rejection_reason,
             'expires_at' => $this->expires_at,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'created_at' => $this->created_at->toIso8601String(),
+            'updated_at' => $this->updated_at->toIso8601String(),
             'user' => $this->whenLoaded('user', fn () => [
                 'name' => $this->user->name,
                 'email' => $this->user->email,
