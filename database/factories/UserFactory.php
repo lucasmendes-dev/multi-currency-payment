@@ -17,6 +17,18 @@ class UserFactory extends Factory
      */
     protected static ?string $password;
 
+    private const COUNTRIES_CURRENCIES = [
+        ['country' => 'Brazil', 'currency' => 'BRL'],
+        ['country' => 'United States', 'currency' => 'USD'],
+        ['country' => 'United Kingdom', 'currency' => 'GBP'],
+        ['country' => 'Japan', 'currency' => 'JPY'],
+        ['country' => 'Switzerland', 'currency' => 'CHF'],
+        ['country' => 'Portugal', 'currency' => 'EUR'],
+        ['country' => 'Germany', 'currency' => 'EUR'],
+        ['country' => 'Canada', 'currency' => 'CAD'],
+        ['country' => 'Australia', 'currency' => 'AUD'],
+    ];
+
     /**
      * Define the model's default state.
      *
@@ -24,14 +36,16 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $pair = fake()->randomElement(self::COUNTRIES_CURRENCIES);
+
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'role' => 'employee',
-            'country' => fake()->country(),
-            'local_currency' => fake()->currencyCode(),
+            'country' => $pair['country'],
+            'local_currency' => $pair['currency'],
             'remember_token' => Str::random(10),
         ];
     }

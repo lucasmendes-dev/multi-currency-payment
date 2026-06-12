@@ -14,6 +14,17 @@ class PaymentRequestFactory extends Factory
 {
     protected $model = PaymentRequest::class;
 
+    private const APPROXIMATE_RATES = [
+        'BRL' => 0.18,
+        'USD' => 0.93,
+        'GBP' => 1.17,
+        'JPY' => 0.0062,
+        'CHF' => 1.05,
+        'EUR' => 1.0,
+        'CAD' => 0.69,
+        'AUD' => 0.61,
+    ];
+
     /**
      * Define the model's default state.
      *
@@ -21,13 +32,17 @@ class PaymentRequestFactory extends Factory
      */
     public function definition(): array
     {
+        $currency = fake()->randomElement(array_keys(self::APPROXIMATE_RATES));
+        $localAmount = fake()->randomFloat(2, 10, 10000);
+        $exchangeRate = self::APPROXIMATE_RATES[$currency] ?? 1.0;
+
         return [
             'user_id' => User::factory(),
-            'local_currency' => fake()->randomElement(['BRL', 'USD', 'GBP', 'JPY', 'CHF']),
-            'local_amount' => fake()->randomFloat(2, 10, 10000),
+            'local_currency' => $currency,
+            'local_amount' => $localAmount,
             'target_currency' => 'EUR',
-            'converted_amount' => fake()->randomFloat(2, 5, 8000),
-            'exchange_rate' => fake()->randomFloat(8, 0.01, 10),
+            'converted_amount' => round($localAmount * $exchangeRate, 2),
+            'exchange_rate' => $exchangeRate,
             'exchange_rate_source' => 'https://v6.exchangerate-api.com',
             'exchange_rate_fetched_at' => now(),
             'description' => fake()->sentence(),
@@ -44,11 +59,11 @@ class PaymentRequestFactory extends Factory
     /**
      * Set the payment request as approved.
      */
-    public function approved(): static
+    public function approved(?User $financeUser = null): static
     {
         return $this->state(fn(array $attributes) => [
             'status' => PaymentStatusEnum::APPROVED,
-            'approved_by' => User::factory()->state(['role' => 'finance']),
+            'approved_by' => $financeUser ? $financeUser->id : User::factory()->state(['role' => 'finance']),
             'approved_at' => now(),
         ]);
     }
@@ -56,11 +71,11 @@ class PaymentRequestFactory extends Factory
     /**
      * Set the payment request as rejected.
      */
-    public function rejected(): static
+    public function rejected(?User $financeUser = null): static
     {
         return $this->state(fn(array $attributes) => [
             'status' => PaymentStatusEnum::REJECTED,
-            'rejected_by' => User::factory()->state(['role' => 'finance']),
+            'rejected_by' => $financeUser ? $financeUser->id : User::factory()->state(['role' => 'finance']),
             'rejected_at' => now(),
             'rejection_reason' => fake()->sentence(),
         ]);
@@ -86,6 +101,30 @@ class PaymentRequestFactory extends Factory
         return $this->state(fn(array $attributes) => [
             'status' => PaymentStatusEnum::PENDING,
             'expires_at' => now()->subHour(),
+        ]);
+    }
+
+    /**
+     * Set the payment request as pending and expired 48 hours ago.
+     */
+    public function expired48h(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'status' => PaymentStatusEnum::PENDING,
+            'expires_at' => now()->subHours(48),
+        ]);
+    }
+
+    public function forCurrency(string $currency): static
+    {
+        $localAmount = fake()->randomFloat(2, 10, 10000);
+        $exchangeRate = self::APPROXIMATE_RATES[$currency] ?? 1.0;
+
+        return $this->state([
+            'local_currency' => $currency,
+            'local_amount' => $localAmount,
+            'converted_amount' => round($localAmount * $exchangeRate, 2),
+            'exchange_rate' => $exchangeRate,
         ]);
     }
 }
