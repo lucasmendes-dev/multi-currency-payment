@@ -19,7 +19,11 @@ A modern, highly polished, and enterprise-grade Laravel 12 & React 19 applicatio
 *   **Strict Types & Data Integrity**: Powered by PHP 8.2+ features, custom Value Objects (e.g., `Money`), Backed Enums (`PaymentStatusEnum`, `UserRoleEnum`), custom Form Requests, and Policies.
 *   **JSON-First API design**: Middleware automatically forces JSON responses across all `/api/*` endpoints.
 
+    *Note: At the beginning of the project, I considered using Laravel's starter kit with Inertia + React, but decided to implement the API and frontend separately (even in the same repo) to better meet the requirements of the challenge.*
+
 ### Frontend Presentation (React 19 + Tailwind CSS v4)
+*   **Monorepo Structure**: The frontend is built as a Single Page Application (SPA) within the `/resources/js/` directory, communicating with the Laravel backend via a RESTful API.
+*   **API Integration**:  Built with React 19, using Vite for fast development, React Router for navigation, and Axios for HTTP requests.
 *   **Premium Visuals & Dark Mode**: A gorgeous user interface featuring a modern dark-mode aesthetic, harmonious color palettes, and glassmorphic micro-animations.
 *   **Live Dashboard**: Interactive workspace for submitting payment requests, filtering through active submissions, and a dedicated workspace for Finance personnel to review and process pending requests.
 
@@ -108,21 +112,15 @@ This project is fully dockerized with a multi-container environment (MySQL, Redi
 
 ## ⏰ Background Scheduler (Auto-Expiration)
 
-Payment requests remaining `pending` for more than **48 hours** are marked `expired`.
+Payment requests remaining `pending` for more than **48 hours** are marked `expired`. There is a column `expires_at` in the `payment_requests` table that is set to `NOW() + 48 hours` when a payment request is created.
 
-*   **Docker Container Scheduler**: The `worker` service inside `docker-compose.yml` automatically executes the command continuously in background:
+*   **Docker Container Scheduler**: The `worker` service inside `docker-compose.yml` *automatically* executes the command continuously in background:
     ```bash
     php artisan schedule:work
     ```
-*   **Manual Trigger**: To manually trigger the evaluation of pending payments expiration immediately (2 examples will have dates expired):
+*   **Manual Trigger**: You can also manually trigger the evaluation of pending payments expiration immediately by running:
     ```bash
     docker compose exec app php artisan payments:expire
-    ```
-    *Note: In production you can create a cron (crontab) to run it automatically: *
-    ```bash
-    user@OS:~crontab -e
-    #then add
-    * * * * * cd /pathToProject/multi-currency-payment/ && docker compose exec app php artisan schedule:run >> /dev/null 2>&1
     ```
 
 ---
