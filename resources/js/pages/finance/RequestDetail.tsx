@@ -124,7 +124,9 @@ export default function FinanceRequestDetail() {
                         <DetailRow label="Updated" value={dateTime(request.updated_at)} />
                         <DetailRow label="Expires" value={dateTime(request.expires_at)} />
                         <DetailRow label="Approved at" value={dateTime(request.approved_at)} />
+                        <DetailRow label="Approved by" value={request.approved_by ?? '-'} />
                         <DetailRow label="Rejected at" value={dateTime(request.rejected_at)} />
+                        <DetailRow label="Rejected by" value={request.rejected_by ?? '-'} />
                         <DetailRow label="Rejection reason" value={request.rejection_reason ?? '-'} />
                     </dl>
                 </CardContent>
